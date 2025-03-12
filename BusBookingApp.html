@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Booking App</title>
+</head>
+<body>
+    <h1>Bus Booking App</h1>
+    <form id="busForm">
+        <input type="text" id="name" placeholder="Name" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="tel" id="phone" placeholder="Phone" required />
+        <select id="busSelect">
+            <option value="Bus1">Bus1</option>
+            <option value="Bus2">Bus2</option>
+            <option value="Bus3">Bus3</option>
+        </select>
+        <button type="submit">Book Bus</button>
+    </form>
+
+    <h2>Filter Buses</h2>
+    <select id="filterBus">
+        <option value="All">All</option>
+        <option value="Bus2">Bus1</option>
+        <option value="Bus2">Bus2</option>
+        <option value="Bus2">Bus3</option>
+    </select>
+
+    <div id="busList"></div>
+
+    <script src>
+      const form = document.getElementById("busForm");
+const busList = document.getElementById("busList");
+const filterBus = document.getElementById("filterBus");
+
+const CRUDCRUD_URL = "https://crudcrud.com/api/fe6c19b77eff4c169dc19adc3837c48d/buses"; // Replace YOUR_UNIQUE_KEY with actual CRUDCRUD key
+
+// Fetch and display data
+async function fetchData() {
+    const res = await fetch(CRUDCRUD_URL);
+    const data = await res.json();
+    displayData(data);
+}
+
+// Display data
+function displayData(data) {
+    busList.innerHTML = "";
+    const filteredBus = filterBus.value;
+    data.filter(bus => filteredBus === "All" || bus.busType === filteredBus)
+        .forEach(bus => {
+            const entry = document.createElement("div");
+            entry.innerHTML = `
+                <p>${bus.name} - ${bus.email} - ${bus.phone} - ${bus.busType}</p>
+                <button onclick="editEntry('${bus._id}', '${bus.name}', '${bus.email}', '${bus.phone}', '${bus.busType}')">Edit</button>
+                <button onclick="deleteEntry('${bus._id}')">Delete</button>
+            `;
+            busList.appendChild(entry);
+        });
+}
+
+// Add data
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const busData = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        phone: document.getElementById("phone").value,
+        busType: document.getElementById("busSelect").value
+    };
+
+    await fetch(CRUDCRUD_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(busData)
+    });
+
+    fetchData();
+    form.reset();
+});
+
+// Delete data
+async function deleteEntry(id) {
+    await fetch(`${CRUDCRUD_URL}/${id}`, { method: "DELETE" });
+    fetchData();
+}
+
+// Edit data
+async function editEntry(id, name, email, phone, busType) {
+    document.getElementById("name").value = name;
+    document.getElementById("email").value = email;
+    document.getElementById("phone").value = phone;
+    document.getElementById("busSelect").value = busType;
+
+    await deleteEntry(id); // Delete old data first for updating the entry
+}
+
+// Filter functionality
+filterBus.addEventListener("change", fetchData);
+
+// Initial Data Load
+fetchData();
+    </script>
+</body>
+</html>
