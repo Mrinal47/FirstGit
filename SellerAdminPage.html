@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller's Admin Page</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    
+    <label>Product Name:</label>
+    <input type="text" id="productName">
+    
+    <label>Selling Price:</label>
+    <input type="number" id="sellingPrice">
+    
+    <label>Category:</label>
+    <select id="category">
+        <option value="Electronics">Electronics</option>
+        <option value="Food">Food</option>
+        <option value="Skincare">Skincare</option>
+    </select>
+    
+    <button id="addProductBtn">Add Product</button>
+    
+    <h3>Products</h3>
+    <h4>Electronics</h4>
+    <ul id="electronicsList"></ul>
+    <h4>Food</h4>
+    <ul id="foodList"></ul>
+    <h4>Skincare</h4>
+    <ul id="skincareList"></ul>
+
+    <script>
+        const API_URL = "https://crudcrud.com/api/416b05de865a42fb9062f7a4ac3e0532/products";
+
+        function fetchProducts() {
+            axios.get(API_URL)
+                .then(response => {
+                    const categories = {
+                        Electronics: document.getElementById("electronicsList"),
+                        Food: document.getElementById("foodList"),
+                        Skincare: document.getElementById("skincareList")
+                    };
+                    
+                    Object.values(categories).forEach(list => list.innerHTML = "");
+                    
+                    response.data.forEach(product => {
+                        if (!categories[product.category]) {
+                            console.error(`Unknown category: ${product.category}`);
+                            return;
+                        }
+                        const li = document.createElement("li");
+                        li.innerHTML = `${product.productName} - $${product.sellingPrice} 
+                            <button onclick="deleteProduct('${product._id}')">Delete Order</button>`;
+                        categories[product.category].appendChild(li);
+                    });
+                })
+                .catch(error => console.error("Error fetching products:", error));
+        }
+
+        function addProduct(event) {
+            event.preventDefault();
+            const productName = document.getElementById("productName").value.trim();
+            const sellingPrice = document.getElementById("sellingPrice").value.trim();
+            const category = document.getElementById("category").value;
+            
+            if (!productName || !sellingPrice) {
+                alert("Please fill in all fields.");
+                return;
+            }
+            
+            const product = { productName, sellingPrice, category };
+            axios.post(API_URL, product)
+                .then(() => {
+                    fetchProducts();
+                    document.getElementById("productName").value = "";
+                    document.getElementById("sellingPrice").value = "";
+                })
+                .catch(error => console.error("Error adding product:", error));
+        }
+
+        function deleteProduct(id) {
+            axios.delete(`${API_URL}/${id}`)
+                .then(() => fetchProducts())
+                .catch(error => console.error("Error deleting product:", error));
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("addProductBtn").addEventListener("click", addProduct);
+            fetchProducts();
+        });
+    </script>
+</body>
+</html>
