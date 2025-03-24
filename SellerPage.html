@@ -19,11 +19,11 @@
   <button onclick="addProduct()">Add Product</button>
 
   <h3>Products</h3>
-  <h4>Electronics</h4>
+  <h4>Electronics Items</h4>
   <ul id="electronicsList"></ul>
-  <h4>Food</h4>
+  <h4>Food Items</h4>
   <ul id="foodList"></ul>
-  <h4>SkinCare</h4>
+  <h4>SkinCare Items</h4>
   <ul id="skinCareList"></ul>
 
   <script>
@@ -43,7 +43,7 @@
               response.data.forEach(product => {
                 const li = document.createElement("li");
                 li.innerHTML = `$${product.sellingPrice} - ${product.productName}
-                <button onclick="deleteProduct('${product._id}')"> Delete Order </button>`
+                <button onclick="deleteProduct('${product._id}')">Delete Order</button>`
                 categories[product.category].appendChild(li);
               })
            })
@@ -84,3 +84,5 @@
     }
     
   </script>
+  </body>
+</html>
