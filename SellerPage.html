@@ -6,7 +6,7 @@
 <body>
   
   <label> Selling Price </label>
-  <input type="text" id="sellingPrice">
+  <input type="number" id="sellingPrice">
   <label> Product Name: </label>
   <input type="text" id="productName">
   <label> Category </label>
@@ -16,7 +16,7 @@
     <option value="skinCare">SkinCare</option>
   </select>
 
-  <button onclick="addProduct()">Add Product</button>
+  <button id="addButton">Add Product</button>
 
   <h3>Products</h3>
   <h4>Electronics Items</h4>
@@ -28,6 +28,8 @@
 
   <script>
     const API_URL = "https://crudcrud.com/api/416b05de865a42fb9062f7a4ac3e0532/products";
+    
+    document.getElementById("addButton").addEventListener("click", addProduct);
 
     function fetchProducts() {
         axios.get(API_URL)
