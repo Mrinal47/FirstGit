@@ -1,0 +1,86 @@
+<html>
+<head>
+<title> Seller's Admin Page </title>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  
+  <label> Selling Price </label>
+  <input type="text" id="sellingPrice">
+  <label> Product Name: </label>
+  <input type="text" id="productName">
+  <label> Category </label>
+  <select id="category">
+    <option value="electronics">Electronics</option>
+    <option value="food">Food</option>
+    <option value="skinCare">SkinCare</option>
+  </select>
+
+  <button onclick="addProduct()">Add Product</button>
+
+  <h3>Products</h3>
+  <h4>Electronics</h4>
+  <ul id="electronicsList"></ul>
+  <h4>Food</h4>
+  <ul id="foodList"></ul>
+  <h4>SkinCare</h4>
+  <ul id="skinCareList"></ul>
+
+  <script>
+    const API_URL = "https://crudcrud.com/api/416b05de865a42fb9062f7a4ac3e0532/products";
+
+    function fetchProducts() {
+        axios.get(API_URL)
+           .then(response => {
+              const categories = {
+                Electronics: document.getElementById("electronicsList"),
+                Food: document.getElementById("foodList"),
+                SkinCare: document.getElementById("skinCareList")
+              };
+
+              Object.values(categories).forEach(list => list.innerHTML= "");
+
+              response.data.forEach(product => {
+                const li = document.createElement("li");
+                li.innerHTML = `$${product.sellingPrice} - ${product.productName}
+                <button onclick="deleteProduct('${product._id}')"> Delete Order </button>`
+                categories[product.category].appendChild(li);
+              })
+           })
+           .catch(error => {
+              console.log(error);
+           })
+
+    function addProduct() {
+        const sellingPrice = document.getElementById("sellingPrice".value);
+        const productName = document.getElementById("productName".value);
+        const category = document.getElementById("category".value);
+
+        const product = { sellingPrice, productName, category };
+
+        axios.post(API_URL, product)
+            .then(() => {
+                fetchProducts();
+                const productList = document.getElementById("sellingPrice").value= "";
+                document.getElementById("productName").value= "";
+            })
+            .catch(error => {
+                console.log(error);
+            })    
+    }
+
+    function deleteProduct(userId) {
+        axios.delete(`${API_URL}/${userId}`)
+            .then(() => {
+                fetchProducts();
+            })
+            .catch(error => {
+                console.log(error);
+            })
+    }
+
+    fetchProducts();
+
+    }
+    
+  </script>
